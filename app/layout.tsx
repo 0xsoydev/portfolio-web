@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Navbar from "@/components/Navbar";
+import localFont from 'next/font/local';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -11,6 +13,18 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+const lexend = localFont({
+  src: '../public/fonts/LexendVariable.ttf',
+  display: 'swap',
+  variable: '--font-lexend'
+})
+
+const dmSerif = localFont({
+  src:'../public/fonts/DMSerif.ttf',
+  display: 'swap',
+  variable: '--font-dmSerif'
+})
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -23,11 +37,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${lexend.variable} ${dmSerif.variable} antialiased`}
       >
-        {children}
+        <main className="pt-8">
+          <div className="w-[70%] mx-auto px-4">
+            <Navbar />
+            {children}
+          </div>
+        </main>
       </body>
     </html>
   );
