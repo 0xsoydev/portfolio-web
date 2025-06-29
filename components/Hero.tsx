@@ -25,7 +25,7 @@ const Hero = () => {
             </div>
             <div className='font-lexend text-base sm:text-lg lg:text-xl leading-relaxed max-w-xl mx-auto lg:mx-0'>
               <span className="text-lg md:text-xl font-lexend">
-                <span className='text-neutral-500'>I'm a</span> DevOps Engineer 
+                <span className='text-neutral-500'>I&apos;m a</span> DevOps Engineer 
                 <span className='text-neutral-500'> &</span> Full Stack Developer 
                 <span className='text-neutral-500'> based in
                   </span> Mumbai, India</span>
