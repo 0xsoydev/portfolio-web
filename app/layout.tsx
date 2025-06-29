@@ -42,7 +42,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${lexend.variable} ${dmSerif.variable} antialiased`}
       >
         <main className="pt-8">
-          <div className="w-[70%] mx-auto px-4">
+          <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <Navbar />
             {children}
           </div>

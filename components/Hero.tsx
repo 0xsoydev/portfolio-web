@@ -1,34 +1,45 @@
 'use client'
 
 import React from 'react'
-import { Button } from '@/components/ui/button'
+import Image from 'next/image'
 import Contributions from './Contributions'
+import RecentActivity from './RecentActivity'
 
 const Hero = () => {
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
-      <div className='flex flex-col items-center relative max-w-4xl mx-auto z-10'>
+    <section className='mt-8 sm:mt-12 lg:mt-20'>
+      <div className='flex flex-col lg:flex-row items-center gap-6 lg:gap-10'>
+        <div className='flex-shrink-0'>
+          <Image 
+            src='/avatar.png' 
+            alt='Wahid Shaikh' 
+            height={150} 
+            width={150} 
+            className='rounded-full w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36 xl:w-40 xl:h-40 ring-3 ring-neutral-800'
+          />
+        </div>
+        <div className='flex-grow text-center lg:text-left'>
+          <div className='space-y-4'>
+            <div className='text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-lexend leading-tight font-semibold'>
+              <span className='text-neutral-500'>Hey, I'm</span> Wahid Shaikh. 
+            </div>
+            <div className='font-lexend text-base sm:text-lg lg:text-xl leading-relaxed max-w-xl mx-auto lg:mx-0'>
+              <span className='text-neutral-500'>I'm a</span> DevOps Engineer <span className='text-neutral-500'>&</span> Full Stack Developer <span className='text-neutral-500'>based in</span> Mumbai, India.
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <div className='text-4xl md:text-6xl lg:text-7xl font-lexend font-extralight bg-gradient-to-t from-gray-900/30 to-white/60 text-transparent bg-clip-text z-10 relative tracking-widest'>
-          HELLO, I'M
+      <div className='md:mt-12 mt-8 sm:mt-10'>
+        <div className='font-lexend text-lg md:text-2xl mb-6 font-medium'>
+          My Contributions
         </div>
-        
-        <div className='text-6xl md:text-8xl lg:text-9xl font-lexend font-bold -mt-4 md:-mt-8 lg:-mt-8 relative z-20 text-center leading-none xl:whitespace-nowrap'>
-          <span className='bg-gradient-to-b from-blue-100 via-blue-500 to-neutral-950 bg-clip-text font-dmSerif text-transparent drop-shadow-[0_0_20px_rgba(59,130,246,0.5)] filter'>
-            Wahid Shaikh
-          </span>
+        <div>
+          <Contributions />
         </div>
-        
-        <div className='text-lg md:text-xl text-white/40 mt-2 text-center max-w-2xl font-lexend font-light'>
-          DevOps & Full Stack Developer
+        <div className='mt-10'>
+          <RecentActivity />
         </div>
-
-          <div className='mt-10'>
-           <div className='flex gap-6'>
-           <Button className="px-9 py-7 bg-transparent text-muted-foreground border-2 hover:bg-blue-500 hover:text-white">My Resume</Button>
-           <Button className="px-9 py-7 bg-transparent text-white border-2 hover:bg-white hover:text-black">Github</Button>
-           </div>
-         </div>
       </div>
     </section>
   )
