@@ -55,7 +55,7 @@ const Contact = () => {
             {/* Introduction */}
             <div className="mb-8">
                 <p className="text-sm md:text-base text-neutral-400 leading-relaxed max-w-2xl">
-                    I'm always open to discussing new opportunities, interesting projects, or just having a chat about technology. 
+                    I&apos;m always open to discussing new opportunities, interesting projects, or just having a chat about technology. 
                     Feel free to reach out through any of the channels below.
                 </p>
             </div>
@@ -90,6 +90,7 @@ const Contact = () => {
                     Currently based in Mumbai, India • Available for remote work
                 </p>
             </div>
+
         </div>
     )
 }

@@ -1,12 +1,21 @@
 import { NextResponse } from 'next/server'
 import { Octokit } from 'octokit'
 
-const octokit = new Octokit({
-    auth: process.env.GITHUB_PAT
-})
-
 export async function GET() {
     try {
+        // Check if GitHub token is available
+        if (!process.env.GITHUB_PAT) {
+            return NextResponse.json(
+                { error: 'GitHub authentication not configured' },
+                { status: 500 }
+            )
+        }
+
+        // Initialize Octokit with the auth token
+        const octokit = new Octokit({
+            auth: process.env.GITHUB_PAT
+        })
+
         // Get the authenticated user's username first
         const { data: user } = await octokit.rest.users.getAuthenticated()
         
@@ -23,7 +32,11 @@ export async function GET() {
 
         return NextResponse.json({ contributions: meaningfulEvents })
     } catch (error) {
-        console.error('Error fetching recent contributions:', error)
+        // Log error in development only
+        if (process.env.NODE_ENV === 'development') {
+            console.error('Error fetching recent contributions:', error)
+        }
+        
         return NextResponse.json(
             { error: 'Failed to fetch recent contributions' },
             { status: 500 }

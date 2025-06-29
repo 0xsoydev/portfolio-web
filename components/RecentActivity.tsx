@@ -8,7 +8,24 @@ interface GitHubEvent {
         url: string
     }
     created_at: string | null
-    payload: any
+    payload: {
+        commits?: Array<{
+            message?: string
+        }>
+        pull_request?: {
+            title?: string
+        }
+        issue?: {
+            title?: string
+        }
+        action?: string
+        ref_type?: string
+        ref?: string
+        release?: {
+            name?: string
+            tag_name?: string
+        }
+    }
 }
 
 const RecentActivity = () => {
@@ -34,7 +51,10 @@ const RecentActivity = () => {
                 
                 setRecentContributions(data.contributions || [])
             } catch (err) {
-                console.error('Error fetching recent contributions:', err)
+                // Log error in development only
+                if (process.env.NODE_ENV === 'development') {
+                    console.error('Error fetching recent contributions:', err)
+                }
                 setError('Failed to fetch recent contributions')
             } finally {
                 setLoading(false)
