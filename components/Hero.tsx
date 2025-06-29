@@ -24,8 +24,11 @@ const Hero = () => {
               <span className='text-neutral-500'>Hey, I&apos;m</span> Wahid Shaikh. 
             </div>
             <div className='font-lexend text-base sm:text-lg lg:text-xl leading-relaxed max-w-xl mx-auto lg:mx-0'>
-              <span className="text-lg md:text-xl text-neutral-400 font-lexend">I&apos;m a passionate full stack developer and UI/UX designer who builds innovative digital experiences.</span>
-              <span className="text-lg md:text-xl text-neutral-400 font-lexend">From concept to deployment, I don&apos;t just code—I create.</span>
+              <span className="text-lg md:text-xl font-lexend">
+                <span className='text-neutral-500'>I'm a</span> DevOps Engineer 
+                <span className='text-neutral-500'> &</span> Full Stack Developer 
+                <span className='text-neutral-500'> based in
+                  </span> Mumbai, India</span>
             </div>
           </div>
         </div>
