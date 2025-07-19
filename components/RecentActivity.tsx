@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 interface GitHubEvent {
     id: string
@@ -32,37 +32,81 @@ const RecentActivity = () => {
     const [recentContributions, setRecentContributions] = useState<GitHubEvent[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const abortControllerRef = useRef<AbortController | null>(null)
+    const isRequestInProgressRef = useRef(false)
 
-    useEffect(() => {
-        const fetchRecentContributions = async () => {
-            try {
-                setLoading(true)
-                const response = await fetch('/api/recent-activity')
-                
-                if (!response.ok) {
-                    throw new Error('Failed to fetch recent contributions')
-                }
-                
-                const data = await response.json()
-                
-                if (data.error) {
-                    throw new Error(data.error)
-                }
-                
-                setRecentContributions(data.contributions || [])
-            } catch (err) {
-                // Log error in development only
-                if (process.env.NODE_ENV === 'development') {
-                    console.error('Error fetching recent contributions:', err)
-                }
-                setError('Failed to fetch recent contributions')
-            } finally {
-                setLoading(false)
-            }
+    const fetchRecentContributions = async () => {
+        // Prevent multiple simultaneous requests
+        if (isRequestInProgressRef.current) {
+            console.log('Request already in progress, skipping...')
+            return
         }
 
+        try {
+            // Cancel any existing request
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort()
+            }
+
+            // Create new abort controller
+            abortControllerRef.current = new AbortController()
+            isRequestInProgressRef.current = true
+
+            setLoading(true)
+            setError(null)
+            
+            // Add timestamp to prevent caching
+            const timestamp = Date.now()
+            const response = await fetch(`/api/recent-activity?t=${timestamp}`, {
+                cache: 'no-store',
+                headers: {
+                    'Cache-Control': 'no-cache'
+                },
+                signal: abortControllerRef.current.signal
+            })
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch recent contributions')
+            }
+            
+            const data = await response.json()
+            
+            if (data.error) {
+                throw new Error(data.error)
+            }
+            
+            setRecentContributions(data.contributions || [])
+        } catch (err) {
+            // Don't set error if request was aborted
+            if (err instanceof Error && err.name === 'AbortError') {
+                console.log('Request was aborted')
+                return
+            }
+
+            // Log error in development only
+            if (process.env.NODE_ENV === 'development') {
+                console.error('Error fetching recent contributions:', err)
+            }
+            setError('Failed to fetch recent contributions')
+        } finally {
+            setLoading(false)
+            isRequestInProgressRef.current = false
+        }
+    }
+
+    useEffect(() => {
         fetchRecentContributions()
+
+        // Cleanup function to abort any ongoing requests
+        return () => {
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort()
+            }
+            isRequestInProgressRef.current = false
+        }
     }, [])
+
+
 
     const formatEventDescription = (event: GitHubEvent) => {
         if (!event.type) return 'Unknown activity'
@@ -98,6 +142,12 @@ const RecentActivity = () => {
                     return `Released ${releaseName}`
                 }
                 return `${event.payload.action} release`
+            case 'ForkEvent':
+                return `Forked repository`
+            case 'WatchEvent':
+                return `Starred repository`
+            case 'PublicEvent':
+                return `Made repository public`
             default:
                 return event.type.replace('Event', '')
         }
@@ -142,7 +192,7 @@ const RecentActivity = () => {
                                 href={`https://github.com/${event.repo.name}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-xs md:text-sm text-neutral-500 hover:text-neutral-300 transition-colors ml-4 font-lexend"
+                                className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors font-lexend ml-4"
                             >
                                 {event.repo.name}
                             </a>
