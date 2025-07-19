@@ -2,7 +2,16 @@ import { NextResponse } from 'next/server'
 import { Octokit } from 'octokit'
 
 // Enhanced event type with metadata for deduplication
-type EnhancedEvent = any & {
+interface EnhancedEvent {
+    id: string
+    type: string | null
+    repo: {
+        id?: number
+        name: string
+        url: string
+    }
+    created_at: string | null
+    payload: Record<string, unknown>
     _meta?: {
         commitSha: string
         repoName: string
@@ -86,28 +95,28 @@ export async function GET() {
                         })
 
                         // Convert commits to event-like objects
-                        return commits.map(commit => ({
-                            id: `commit-${commit.sha}`,
-                            type: 'PushEvent',
-                            created_at: commit.commit.author?.date || commit.commit.committer?.date,
-                            repo: {
-                                name: `${repo.owner.login}/${repo.name}`,
-                                url: repo.html_url
-                            },
-                            payload: {
-                                commits: [{
-                                    message: commit.commit.message,
-                                    sha: commit.sha
-                                }]
-                            },
-                            // Add metadata for better deduplication
-                            _meta: {
-                                commitSha: commit.sha,
-                                repoName: `${repo.owner.login}/${repo.name}`,
-                                timestamp: commit.commit.author?.date || commit.commit.committer?.date
-                            }
-                        }))
-                    } catch (error) {
+                                                 return commits.map(commit => ({
+                             id: `commit-${commit.sha}`,
+                             type: 'PushEvent' as const,
+                             created_at: commit.commit.author?.date || commit.commit.committer?.date || null,
+                             repo: {
+                                 name: `${repo.owner.login}/${repo.name}`,
+                                 url: repo.html_url
+                             },
+                             payload: {
+                                 commits: [{
+                                     message: commit.commit.message,
+                                     sha: commit.sha
+                                 }]
+                             },
+                             // Add metadata for better deduplication
+                             _meta: {
+                                 commitSha: commit.sha,
+                                 repoName: `${repo.owner.login}/${repo.name}`,
+                                 timestamp: commit.commit.author?.date || commit.commit.committer?.date || ''
+                             }
+                         }))
+                    } catch {
                         // Skip repos we can't access
                         return []
                     }
@@ -124,8 +133,8 @@ export async function GET() {
                 })
             }
 
-        } catch (error) {
-            console.error('Error in parallel API calls:', error)
+        } catch (err) {
+            console.error('Error in parallel API calls:', err)
         }
 
         // Enhanced deduplication logic
@@ -138,10 +147,11 @@ export async function GET() {
             
             if (event.type === 'PushEvent') {
                 // For push events, try to extract commit info for better deduplication
-                const payload = event.payload as any
+                const payload = event.payload as Record<string, unknown>
+                const commits = payload?.commits as Array<{ sha?: string }> | undefined
                 const commitSha = event._meta?.commitSha || 
-                                 payload?.commits?.[0]?.sha ||
-                                 payload?.head
+                                 commits?.[0]?.sha ||
+                                 (payload?.head as string)
                 
                 const repoName = event.repo?.name
                 const timestamp = event.created_at
